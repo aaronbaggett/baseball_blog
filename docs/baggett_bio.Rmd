@@ -1,0 +1,9 @@
+---
+output: html_document
+---
+
+**Aaron Baggett** lives in Belton, Texas.  
+Aaron is currently an Assistant Professor of Psychology at the University of Mary Hardin-Baylor.  He teaches courses in introductory statistics and experimental design for the social sciences.  A former high school and college baseball umpire, Aaron is primarily interested in modeling MLB umpire ball—strike judgment and decision making patterns using PITCHf/x data with application to the sport and cognitive psychological sciences.  His Ph.D. dissertation was entitled, Effects of Pitch Location and Count on Professional Baseball Umpires' Ball--Strike Decisions.
+
+[Aaron’s home page](http://aaronbaggett.com)  
+[Aaron on Twitter](https://twitter.com/aaron_baggett)
