@@ -3,11 +3,18 @@ output: html_document
 ---
 Hi everyone!  I'm really excited to be joining Max, Jim, Carson, and Brian here at Exploring Baseball Data with **R**.
 
-I'm Aaron Baggett.  I live in Belton, TX where I'm associate professor of psychology at the University of Mary Hardin-Baylor.  I completed my Ph.D. at Baylor University in Waco, TX in educational psychology with a concentration in measurement and statistics.  I've always been a big baseball nerd so when I started learning statistics in graduate school it was a given that I would apply what I was learning to the wealth of baseball data available.
+I'm Aaron Baggett.  I live in Belton, TX where I'm associate professor of psychology at the University of Mary Hardin-Baylor.  I completed my Ph.D. at Baylor University in Waco, TX in educational psychology with a concentration in measurement and statistics.  I've always been a big baseball nerd so when I started learning statistics in graduate school it was a given that I would apply what I was learning to the wealth of available baseball data.  Thanks to [Carson's](link) amazing [`pitchRx` package](link), we can access what, to me, is some of the richest publicly available baseball data to date.
+
+One of my primary research interests is better understanding judgment and decision making processes of expert sports officials.  Although the PITCHf/x data do not allow us to monitor the visual and spatial accuities of umpires as in a laboratory, we can, however, observe with a good deal of precision, patterns of judgment and decision making.
+
+To be able to precisely measure home plate umpires' decisions using PITCHf/x data, we need to first understand a few things about
+
+
+For my first post, I thought it would be valuable to explore some interesting factors related to properly parameterizing the strike zone.  
 
 For this post, I'll load the following **R** packages as well as the PITCHf/x data from 2014.  I've already scraped and cleaned the 2014 PITCHf/x data using Carson's [`pitchRx`](link) package.  If you want to get up and running with your own PITCHf/x database, check out [Carson's earlier posts](link).
 
-```{r}
+```{r, eval = FALSE}
 # Load package libraries
 library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
@@ -19,7 +26,7 @@ load(url("http://aaronbaggett.com/data/pfx_14.rda"))
 
 What effect does ... have on measuring home plate umpire decision accuracy?
 
-For my first post, I thought it would be valuable to explore some interesting factors related to properly parameterizing the strike zone.  There was some talk just last week about MLB possibly considering revising the rule book definition of the strike zone to include pitches located in the lower region.  [Brian](link), and [others](link), suggest umpires' tendency to call the low strike has resulted in a noticeable decline in run scoring.  For now though, the strike zone is outlined in the [Official Baseball Rules](http://pressbox.mlb.com/pressbox/downloads/y2014/2014_Official_Baseball_Rules.pdf) (MLB, 2014) under Rule 2.00.  
+  There was some talk just last week about MLB possibly considering revising the rule book definition of the strike zone to include pitches located in the lower region.  [Brian](link), and [others](link), suggest umpires' tendency to call the low strike has resulted in a noticeable decline in run scoring.  For now though, the strike zone is outlined in the [Official Baseball Rules](http://pressbox.mlb.com/pressbox/downloads/y2014/2014_Official_Baseball_Rules.pdf) (MLB, 2014) under Rule 2.00.  
 
 The following definition is offered:
 
@@ -55,12 +62,12 @@ ggplot() +
 ```
 
 <div align="center">
-![alt text](Figs/zones.jpg)
+![alt text](../figs/zones)
 </div>
 
 When we examine the PITCHf/x data, the width of the strike zone is set automatically to the uniform width of home plate (17 inches).  We can see this by extracting the minimum and maximum *x*-coordinate (`px`) values of all pitches by each region of the strike zone (`zone`).  To see this in **R**, it's as easy as grouping the data by the `zone` variable and calculating the minimum and maximum `px` values in `dplyr`.
 
-```{r}
+```{r, eval = FALSE}
 # Find width of PITCHf/x parameters by *zone*
 pfx_14 %>% 
   group_by(zone) %>% 

@@ -2,7 +2,7 @@
 # R Code
 # Exploring Baseball Data with R
 # Post: Title
-# 02/13/2015
+# 02/16/2015
 # ===========================================================
 
 # Load package libraries
