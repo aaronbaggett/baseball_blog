@@ -110,7 +110,7 @@ ggplot(data = sort_pfx_accuracy,
 
 pfx_accuracy <- pfx_14 %>%
   group_by(umpire) %>%
-  summarize(accuracy = mean(u_test_pfx), 
+  summarize(accuracy = mean(u_test_pfx),
     se = sd(u_test_pfx) / sqrt(length(u_test_pfx)))
 
 with(pfx_accuracy, min(accuracy))
