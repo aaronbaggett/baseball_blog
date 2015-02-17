@@ -1,15 +1,18 @@
 ---
 output: html_document
 ---
+
+# Greetings!
+
 Hi everyone!  I'm really excited to be joining Max, Jim, Carson, and Brian here at Exploring Baseball Data with **R**.
 
-I'm Aaron Baggett.  I live in Belton, TX where I'm associate professor of psychology at the University of Mary Hardin-Baylor.  I completed my Ph.D. at Baylor University in Waco, TX in educational psychology with a concentration in measurement and statistics.  I've always been a big baseball nerd so when I started learning statistics in graduate school it was a given that I would apply what I was learning to the wealth of available baseball data.  Thanks to [Carson's](link) amazing [`pitchRx` package](link), we can access what, to me, is some of the richest publicly available baseball data to date.
+I'm Aaron Baggett.  I live in Belton, TX where I'm associate professor of psychology at the University of Mary Hardin-Baylor.  I completed my Ph.D. at Baylor University in Waco, TX in educational psychology with a concentration in measurement and statistics.  I've always been a big baseball nerd so when I started learning statistics in graduate school it was a given that I would apply what I was learning to the wealth of available baseball data.  Thanks to [Carson's](https://twitter.com/cpsievert) amazing [`pitchRx` package](http://cpsievert.github.io/pitchRx/RJwrapper.pdf), we can access what, to me, is some of the richest publicly available baseball data to date.
 
-One of my primary research interests is better understanding judgment and decision making processes of expert sports officials.  Although the PITCHf/x data do not allow us to monitor the visual and spatial accuities of umpires, for example  We can, however, observe with a good deal of precision, various patterns of judgment and decision making.
+One of my primary research interests is better understanding judgment and decision making processes of expert sports officials.  Although the PITCHf/x data do not allow us to monitor the visual and spatial acuities of umpires, for example  We can, however, observe with a good deal of precision, various patterns of judgment and decision making.
 
-One way to begin understanding umpires' patterns of decision making is to start with a proper conceptualization of the strike zone.  Thus, for my first post, I thought it would be valuable to explore some interesting factors related to properly parameterizing the strike zone width.  This will be the first of probably two (maybe three) strike zone related posts.  In part two we'll look at a few methods for parameterzing the strike zone upper and lower boundaries.
+One way to begin understanding umpires' patterns of decision making is to start with a proper conceptualization of the strike zone.  Thus, for my first post, I thought it would be valuable to explore some interesting factors related to properly parameterizing the strike zone width.  This will be the first of probably two (maybe three) strike zone related posts.  In part two we'll look at a few methods for parameterizing the strike zone upper and lower boundaries.
 
-For this post, I'll load the following **R** packages as well as the PITCHf/x data from 2014.  I've already scraped and cleaned the 2014 PITCHf/x data using Carson's [`pitchRx`](link) package.  If you want to get up and running with your own PITCHf/x database, check out [Carson's earlier posts](link).
+For this post, I'll load the following **R** packages as well as the PITCHf/x data from 2014.  I've already scraped and cleaned the 2014 PITCHf/x data using Carson's [`pitchRx`](http://cpsievert.github.io/pitchRx/RJwrapper.pdf) package.  If you want to get up and running with your own PITCHf/x database, check out [Carson's earlier posts](https://baseballwithr.wordpress.com/author/cpsievert/).
 
 ```{r, eval = TRUE}
 # Load package libraries
@@ -21,12 +24,12 @@ library(lme4, quietly = TRUE)
 load(url("http://aaronbaggett.com/data/pfx_14.rda"))
 ```
 
-Our primary quesitons of interest for this post are:
+Our primary questions of interest for this post are:
 
 1. Are there differences in the width of the strike zone as measured by the PITCHf/x data, compared to the rule book definition of the strike zone width?
 2. If so, are these differences meaningful?
 
-Relatedly, there was some talk just last week about MLB possibly considering revising the rule book definition of the strike zone to include pitches located in the lower region.  [Brian](link), and [others](link), suggest umpires' tendency to call the low strike has resulted in a noticeable decline in run scoring.  For now though, the strike zone is outlined in the [Official Baseball Rules](http://pressbox.mlb.com/pressbox/downloads/y2014/2014_Official_Baseball_Rules.pdf) (MLB, 2014) under Rule 2.00.  
+On a related note,, there was [some talk](https://ca.sports.yahoo.com/news/sources--mlb-could-alter-strike-zone-as-response-to-declining-offense-232940947.html) just last week about MLB possibly considering revising the rule book definition of the strike zone to include pitches located in the lower region.  [Brian](http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2478447), and [others](http://www.hardballtimes.com/the-strike-zone-expansion-is-out-of-control/), suggest umpires' tendency to call the low strike has resulted in a noticeable decline in run scoring.  For now though, the strike zone is outlined in the [Official Baseball Rules](http://pressbox.mlb.com/pressbox/downloads/y2014/2014_Official_Baseball_Rules.pdf) (MLB, 2014) under Rule 2.00.  
 
 The following definition is offered:
 
@@ -36,7 +39,7 @@ pants, and the lower level is a line at the hollow beneath the kneecap. The Stri
 
 Rule 2.00 also defines a STRIKE.  "A STRIKE is a legal pitch when so called by the umpire, which (b) Is not struck at, if any part of the ball passes through any part of the strike zone" (p. 21).  Now that we have some general definitions of the strike zone, let's examine the PITCHf/x data and see how the width is set up.
 
-To see this in **R**, it's as easy as using the [`dplyr` package](link) and extracting the minimum and maximum *x*-coordinate (`px`) values of all pitches by each region of the strike zone (`zone`):
+To see this in **R**, it's as easy as using the [`dplyr` package](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) and extracting the minimum and maximum *x*-coordinate (`px`) values of all pitches by each region of the strike zone (`zone`):
 
 ```{r, eval = TRUE}
 # Find width of PITCHf/x parameters by *zone*
@@ -49,7 +52,7 @@ pfx_14 %>%
     sd_px = sd(px))
 ```
 
-The mininum value for zone 1 is -0.708, while the maximum value for zone 9 is 0.708$^1$.  Since zone 1 represents the left edge of the strike zone (from the umpire's perspective) and zone 9 represents the right edge, we can see that the uniform width is equal to 0.708 inches $\times$ 2 = 1.416 feet.  In other words, 1.416 $\times$ 12 = 17 inches.  Figure X presents an example of the nine regions.
+The minimum value for zone 1 is -0.708, while the maximum value for zone 9 is 0.708$^1$.  Since zone 1 represents the left edge of the strike zone (from the umpire's perspective) and zone 9 represents the right edge, we can see that the uniform width is equal to 0.708 inches $\times$ 2 = 1.416 feet.  In other words, 1.416 $\times$ 12 = 17 inches.  In the figure below, I present an example of the nine regions.
 
 ```{r, eval = TRUE, fig.align = 'center', fig.height = 6}
 # Set up PITCH/fx native strike zone regions data
@@ -93,13 +96,13 @@ with(pfx_accuracy, mean(accuracy))
 with(pfx_accuracy, sd(accuracy))
 ```
 
-It might help to visualize these accuracy rates in a dotplot.  I've set one up in Figure X below and added the *SE* to each side of the accuracy points.  This plot uses our `pfx_accuracy` data frame from above.
+It might help to visualize these accuracy rates in a dotplot.  I've set one up below and added the *SE* to each side of the accuracy points.  This plot uses our `pfx_accuracy` data frame from above.
 
 ```{r, eval = TRUE, fig.align = 'center', fig.height = 12}
 # Sort *pfx_accuracy* in descending order
 sort_pfx_accuracy <- pfx_accuracy[order(-pfx_accuracy$accuracy), ]
 
-### --- Build dot plot --- ###
+### --- Build dotplot --- ###
 ggplot(data = sort_pfx_accuracy, 
   aes(x = accuracy, y = sort(umpire, decreasing = TRUE))) +
   geom_vline(aes(xintercept = mean(accuracy)), 
@@ -120,16 +123,18 @@ ggplot(data = sort_pfx_accuracy,
     axis.text.y = element_text(size = 6))
 ```
 
-In other words, from the umpire's vantage point behind home plate, if the left edge of the baseball passes over the left edge of the plate and is between the batter's upper and lower boundaries, then that pitch should be called a strike.  However, since the coordinates of the PITCHf/x data plot the center point of the baseball, this pitch might appear to be off the plate inside to a right handed batter.  Therefore, an umpire may be incorrectly penalized for having called this pitch a strike.
+Using the PITCHf/x strike zone width parameters, umpire accuracy appears to vary from approximately 81.76% to about 92.06%.  The latter rate is really pretty good.  However, by reconceptualizing the width, I think we can make more accurate estimates of umpire accuracy.
 
-One way to properly account for this discrepancy is to calculate the length of the radius of a regulation sized baseball (1.57 inches) and add that distance to each side of the plate [(1.57 $\times$ 2) + 17].  Figure X displays this transformation$^3$.
+As we saw in the rule book definition of a strike above, a strike occurs when any part of the baseball passes through any part of the strike zone.  In other words, from the umpire's vantage point behind home plate, if the left edge of the baseball passes over the left edge of the plate and is between the batter's upper and lower boundaries, then that pitch should be called a strike.  However, since the coordinates of the PITCHf/x data plot the center point of the baseball, this pitch might appear to be off the plate inside to a right handed batter.  Therefore, an umpire may be incorrectly penalized for having called this pitch a strike.
+
+One way to properly account for this discrepancy is to calculate the length of the radius of a regulation sized baseball (1.57 inches) and add that distance to each side of the plate [(1.57 $\times$ 2) + 17].  Thus, the true strike zone width increases from 17 inches (1.416 feet) to 21.14 inches (1.678 feet).  Below is a rough visual estimate$^3$.
 
 ```{r, echo = FALSE, fig.align='center', fig.height = 7, fig.width = 7}
-# Specify homeplate polygon coordinates
+# Specify home plate polygon coordinates
 plate.x <- c(-0.70833, 0.70833, 0.70833, 0, -0.70833)
 plate.y <- c(1.41666, 1.41666, 0.70833, 0, 0.70833)
 
-# Draw homeplate polygon
+# Draw home plate polygon
 ggplot(data = NULL, aes(x = plate.x, y = plate.y)) + 
   geom_polygon(fill = 'white', color = 'black', 
     size = 1.5, lineend = 'square') +
@@ -157,31 +162,89 @@ ggplot(data = NULL, aes(x = plate.x, y = plate.y)) +
   theme(axis.ticks.y = element_blank(), axis.text.y = element_blank())
 ```
 
-As we can see, the strike zone width is now broadened from 17 inches to approximately 20.14 inches.  The question then is, Do these differences matter?  Let's check it out.
+As we can see, the strike zone width is now broadened from 17 inches to approximately 20.14 inches.  The question then is, Do these differences matter?  Let's check it out.  To do so, we'll basically use the same general **R** code from above.  Only this time, I've added a new variable, `u_test`, to the same `pfx_14` data frame, which now compares the umpire's call to our new dimensions for the width.  I did this using the clunky series of `ifelse` statements below.
 
-Although the rule book definition only addresses the upper and lower boundaries of the strike zone, there are really two parameters we have to address when measuring umpire decision accuracy.  The easiest parameter to establish is the width of the strike zone.  Here's why: 
+```{r}
+# Create *u_test* variable for umpire's decision [1 = correct]
+# Ball radius = ((1.57*2 + 17) / 12) / 2 = 0.8391667
+pfx_14$u_test <- with(pfx_14,
+  ifelse(call == "Ball" & px < -0.8391667 | px > 0.8391667 | 
+    pz < player_sz_bot | pz > player_sz_top, 1,
+  ifelse(call == "Called Strike" & pz >= player_sz_bot & pz <= player_sz_top & 
+    px >= -0.8391667 & px <= 0.8391667, 1,
+  ifelse(call == "Ball" & pz >= player_sz_bot & pz <= player_sz_top & 
+    px > -0.8391667 & px < 0.8391667, 0,
+  ifelse(call == "Called Strike" & px < -0.8391667 | px > 0.8391667 | 
+    pz < player_sz_bot | pz > player_sz_top, 0, 99)))))
+```
 
+Now we're ready to calculate our umpire accuracy rates using our new dimensions for the strike zone width.  Now, let's reexamine umpire accuracy over the course of the entire 2014 season.
 
+```{r, eval = TRUE}
+(new_pfx_accuracy <- pfx_14 %>%
+  group_by(umpire) %>%
+  summarize(accuracy = mean(u_test),
+    se = sd(u_test) / sqrt(length(u_test)))
+)
+```
 
+With our new interpretation of the strike zone width, we see that umpires are now approximately 92.42% accurate (*SD* = 0.013).  This is an overall increase of about 6%.
 
+```{r, eval = TRUE}
+# Calculate mean *accuracy*
+with(new_pfx_accuracy, mean(accuracy))
 
+# Calculate sd *accuracy*
+with(new_pfx_accuracy, sd(accuracy))
+```
 
+Again, we can visualize our new accuracy rates in a dotplot similar to the one above.  This plot uses our `new_pfx_accuracy` data frame from above.
 
-The width of home plate is a uniform 17 inches.
+```{r, eval = TRUE, fig.align = 'center', fig.height = 12}
+# Sort *pfx_accuracy* in descending order
+sort_new_pfx_accuracy <- new_pfx_accuracy[order(-new_pfx_accuracy$accuracy), ]
 
+### --- Build dotplot --- ###
+ggplot(data = sort_new_pfx_accuracy, 
+  aes(x = accuracy, y = sort(umpire, decreasing = TRUE))) +
+  geom_vline(aes(xintercept = mean(accuracy)), 
+    color = "red", linetype = 2, size = 0.35) +
+  geom_segment(aes(x = accuracy - se, xend = accuracy + se, 
+    y = sort(umpire, decreasing = TRUE), 
+    yend = sort(umpire, decreasing = TRUE)), 
+    color = "gray30", size = 0.25) +
+  geom_line(aes(group = 1), color = "gray30") +
+  geom_point(color = "gray10") + 
+  scale_x_continuous(limits = c(0.85, 0.955), breaks = seq(0.85, 0.955, 0.010), 
+    name = "\nUmpire Decision Accuracy\nWidth of Strike Zone = 20.14 inches") +
+  scale_y_discrete(name = "", labels = rev(sort_pfx_accuracy$umpire)) +
+  theme_bw() +
+  theme(axis.title.x = element_text(size = 10), 
+    axis.text.x = element_text(size = 8)) +
+  theme(axis.title.y = element_text(size = 10), 
+    axis.text.y = element_text(size = 6))
+```
 
-Despite the seemingly fixed dimensions of the strike zone, they actually are quite dynamic.  For starters, the upper and lower boundaries depend on batters' stances, and in all reality, batters' heights.  Thus, it can be difficult to establish a set of uniform upper and lower boundarires.
+To put all this in perspective, during the 2014 season, umpires worked about 25 games behind the plate (*SD* = 10.72) and made approximately 146.08 decisions per game (*SD* = 7.07). 
 
-A major portion of my own research involves working to better understand decision-making processes of expert umpires.  PITCHf/x data are essential to statistically modeling these decisions as other comparable methods of data collection are inferior.
+```{r}
+# Calculate mean and SD decisions umpires make during games?
+decisions <- pfx_14 %>%
+  group_by(umpire) %>%
+  filter(call == "Called Strike" | call == "Ball") %>%
+  summarize(games = length(unique(gameday_link)), 
+    n = length(gameday_link), decisions = n/games)
 
+decisions %>%
+  summarize(mean = mean(decisions), sd = sd(decisions))
+```
 
-Ball radius = ((1.57*2 + 17) / 12) / 2 = 0.8391667
+Again, the data include both full-time and AAA call-up umpires who may have either worked spring training or various regular season games.  I realize this may be somewhat problematic, but since this is somewhat exploratory in nature, I'll keep the MiLB guys in.  At any rate, when we compare the proportion of accurate decisions umpires make using our new parameters for the strike zone width, compared to the raw PITCHf/x parameters we see a mean difference of about 8.78 pitches per game (*SD* = 2.05).
 
-
-, which is a mean difference of 8.78 pitches per game (*SD* = 2.05).
+Although the rule book definition only addresses the upper and lower boundaries of the strike zone, there are really two parameters we have to address when measuring umpire decision accuracy.  As we've seen, perhaps the easiest parameter to establish is the width of the strike zone.  In my next post, we'll try and do the same with the upper and lower boundaries.
 
 **Notes:**
 
 1. By the way, this is true for both right and left handed batters.
 2. For now, these data include both spring training and postseason play.  In the future, it may be more accurate to limit our observations to the regular and postseason.  Comments and feedback related to this are welcome!
-3. The code I used to draw the home plate figure is available here at this [GitHub respository](https://github.com/aaronbaggett/baseball_blog)
+3. The code I used to draw the home plate figure is available here at this [GitHub repository](https://github.com/aaronbaggett/baseball_blog)
