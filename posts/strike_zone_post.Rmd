@@ -10,6 +10,8 @@ I'm Aaron Baggett.  I live in Belton, TX where I'm associate professor of psycho
 
 One of my primary research interests is better understanding judgment and decision making processes of expert sports officials.  Although the PITCHf/x data do not allow us to monitor the visual and spatial acuities of umpires, for example  We can, however, observe with a good deal of precision, various patterns of judgment and decision making.
 
+# Conceptualizing the Strike Zone
+
 One way to begin understanding umpires' patterns of decision making is to start with a proper conceptualization of the strike zone.  Thus, for my first post, I thought it would be valuable to explore some interesting factors related to properly parameterizing the strike zone width.  This will be the first of probably two (maybe three) strike zone related posts.  In part two we'll look at a few methods for parameterizing the strike zone upper and lower boundaries.
 
 For this post, I'll load the following **R** packages as well as the PITCHf/x data from 2014.  I've already scraped and cleaned the 2014 PITCHf/x data using Carson's [`pitchRx`](http://cpsievert.github.io/pitchRx/RJwrapper.pdf) package.  If you want to get up and running with your own PITCHf/x database, check out [Carson's earlier posts](https://baseballwithr.wordpress.com/author/cpsievert/).
@@ -18,7 +20,6 @@ For this post, I'll load the following **R** packages as well as the PITCHf/x da
 # Load package libraries
 library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
-library(lme4, quietly = TRUE)
 
 # Read in 2014 PITCHf/x data
 load(url("http://aaronbaggett.com/data/pfx_14.rda"))
@@ -29,7 +30,9 @@ Our primary questions of interest for this post are:
 1. Are there differences in the width of the strike zone as measured by the PITCHf/x data, compared to the rule book definition of the strike zone width?
 2. If so, are these differences meaningful?
 
-On a related note,, there was [some talk](https://ca.sports.yahoo.com/news/sources--mlb-could-alter-strike-zone-as-response-to-declining-offense-232940947.html) just last week about MLB possibly considering revising the rule book definition of the strike zone to include pitches located in the lower region.  [Brian](http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2478447), and [others](http://www.hardballtimes.com/the-strike-zone-expansion-is-out-of-control/), suggest umpires' tendency to call the low strike has resulted in a noticeable decline in run scoring.  For now though, the strike zone is outlined in the [Official Baseball Rules](http://pressbox.mlb.com/pressbox/downloads/y2014/2014_Official_Baseball_Rules.pdf) (MLB, 2014) under Rule 2.00.  
+# Defining the Strike Zone
+
+On a related note, there was [some talk](https://ca.sports.yahoo.com/news/sources--mlb-could-alter-strike-zone-as-response-to-declining-offense-232940947.html) just last week about MLB possibly considering revising the rule book definition of the strike zone to include pitches located in the lower region.  [Brian](http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2478447), and [others](http://www.hardballtimes.com/the-strike-zone-expansion-is-out-of-control/), suggest umpires' tendency to call the low strike has resulted in a noticeable decline in run scoring.  For now though, the strike zone is outlined in the [Official Baseball Rules](http://pressbox.mlb.com/pressbox/downloads/y2014/2014_Official_Baseball_Rules.pdf) (MLB, 2014) under Rule 2.00.
 
 The following definition is offered:
 
@@ -38,6 +41,8 @@ line at the midpoint between the top of the shoulders and the top of the uniform
 pants, and the lower level is a line at the hollow beneath the kneecap. The Strike Zone shall be determined from the batter’s stance as the batter is prepared to swing at a pitched ball (p. 21).
 
 Rule 2.00 also defines a STRIKE.  "A STRIKE is a legal pitch when so called by the umpire, which (b) Is not struck at, if any part of the ball passes through any part of the strike zone" (p. 21).  Now that we have some general definitions of the strike zone, let's examine the PITCHf/x data and see how the width is set up.
+
+# PITCHf/x Strike Zone Width
 
 To see this in **R**, it's as easy as using the [`dplyr` package](http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html) and extracting the minimum and maximum *x*-coordinate (`px`) values of all pitches by each region of the strike zone (`zone`):
 
@@ -124,6 +129,8 @@ ggplot(data = sort_pfx_accuracy,
 ```
 
 Using the PITCHf/x strike zone width parameters, umpire accuracy appears to vary from approximately 81.76% to about 92.06%.  The latter rate is really pretty good.  However, by reconceptualizing the width, I think we can make more accurate estimates of umpire accuracy.
+
+# A New PITCHf/x Strike Zone Width
 
 As we saw in the rule book definition of a strike above, a strike occurs when any part of the baseball passes through any part of the strike zone.  In other words, from the umpire's vantage point behind home plate, if the left edge of the baseball passes over the left edge of the plate and is between the batter's upper and lower boundaries, then that pitch should be called a strike.  However, since the coordinates of the PITCHf/x data plot the center point of the baseball, this pitch might appear to be off the plate inside to a right handed batter.  Therefore, an umpire may be incorrectly penalized for having called this pitch a strike.
 
