@@ -25,9 +25,6 @@ ggplot(data = carp, aes(x = sz_bot)) + geom_density()
 
 heights <- read.csv("/Users/AB/Dropbox/Dissertation/Data/Anthropometric Data/Anthropometric_Measurements.csv")
 
-STATURE: height
-SUPRASTERNALE_HT: length from top of shoulders to ground
-WAIST_HT.OMPHALION: length from top of pants to ground
 
 
 WAIST_HT_NATURAL: length from ground to midpoint between shoulders and waist
@@ -53,6 +50,8 @@ ansur_hts <- ansur %>%
   summarize(ht_top = mean(WAIST_HT_NATURAL)/12, ht_bott = mean(PATELLA.MID_HT)/12)
 
 pfx_14 <- left_join(pfx_14, ansur_hts)
+
+save(pfx_14, "~/Desktop/pfx_14.Rda")
 
 
 
