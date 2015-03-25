@@ -12,6 +12,7 @@ library(lme4, quietly = TRUE)
 
 # Read in 2014 PITCHf/x data
 load(url("http://aaronbaggett.com/data/pfx_14.rda"))
+glimpse(pfx_14)
 
 carp <- pfx_14 %>% 
   #select(sz_top, sz_bot, player_sz_top, player_sz_bot) %>% 
