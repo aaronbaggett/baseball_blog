@@ -2,27 +2,44 @@
 # R Code
 # Exploring Baseball Data with R
 # Post: Conceptualizing the MLB Strike Zone Using PITCHf/x Data Pt. 2
-# 03/19/2015
+# 04/08/2015
 # ===========================================================
 
 # Load package libraries
 library(ggplot2)
 library(dplyr, warn.conflicts = FALSE)
-library(lme4, quietly = TRUE)
 
 # Read in 2014 PITCHf/x data
 load(url("http://aaronbaggett.com/data/pfx_14.rda"))
 glimpse(pfx_14)
 
+# Filter all Matt Carpenter 2014 at bats
 carp <- pfx_14 %>% 
   #select(sz_top, sz_bot, player_sz_top, player_sz_bot) %>% 
   filter(batter_name == "Matt Carpenter")
 
+# Shapiro-Wilk test of normality for
+# Matt Carpenter's 2014 sz_top/sz_bot
 shapiro.test(carp$sz_top)
 shapiro.test(carp$sz_bot)
 
-ggplot(data = carp, aes(x = sz_top)) + geom_density()
-ggplot(data = carp, aes(x = sz_bot)) + geom_density()
+# Density plot of Matt Carpenter's 2014 sz_top
+ggplot(data = carp, aes(x = sz_top)) + 
+  geom_density(fill = "gray35") +
+  scale_x_continuous(breaks = seq(0, 6, 0.10), 
+    name = "\nTop of Strike Zone (sz_top)") +
+  scale_y_continuous(limits = c(0, 8), 
+    breaks = seq(0, 8, 1), name = "Density\n") +
+  theme_bw()
+
+# Density plot of Matt Carpenter's 2014 sz_bot
+ggplot(data = carp, aes(x = sz_bot)) +
+  geom_density(fill = "gray35") +
+  scale_x_continuous(breaks = seq(0, 2, 0.10), 
+    name = "\nBottom of Strike Zone (sz_bot)") +
+  scale_y_continuous(limits = c(0, 16), 
+    breaks = seq(0, 16, 2), name = "Density\n") +
+  theme_bw()
 
 heights <- read.csv("/Users/AB/Dropbox/Dissertation/Data/Anthropometric Data/Anthropometric_Measurements.csv")
 
