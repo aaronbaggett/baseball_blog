@@ -6,7 +6,7 @@ output: html_document
 
 In [my last post](https://baseballwithr.wordpress.com/2015/02/17/conceptualizing-the-mlb-strike-zone-using-pitchfx-data/) we examined differences in the width of the MLB strike zone as measured by the PITCHf/x data, compared to the rule book definition of the strike zone width.  In this post, we'll continue examining methods for properly parameterizing the MLB strike zone by addressing the upper and lower boundaries.  Again, we're primarily interested in understanding umpires' patterns of decision making.  When measuring anything, we must ensure all parameters are properly operationalized.  We've already seen that when we account for the radius of a regulation sized baseball by adding 1.57 inches to each side of the plate, umpires' accuracy rates improve from approximately XX% to about XX%.  This difference of XX inches matters--especially if you're at all tired of hearing people complain about how "bad" umpires are.
 
-![umpires](https://twitter.com/BMMillsy/status/584893409447510016)
+![umpires](https://github.com/aaronbaggett/baseball_blog/blob/master/figs/twitter_umpires.png)
 
 Unlike the width, the upper and lower boundaries of the strike zone are dynamic.  Let's refer back to Rule 2.00 of the [Official Baseball Rules](http://pressbox.mlb.com/pressbox/downloads/y2014/2014_Official_Baseball_Rules.pdf) (MLB, 2014):
 
