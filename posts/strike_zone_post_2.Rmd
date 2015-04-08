@@ -100,7 +100,7 @@ Several measurements from the ANSUR data are of interest here: 1. STATURE: Indiv
 </center>
 <br>
 
-Using `dplyr`, I extracted the STATURE, WAIST_HT_NATURAL, and PATELLA.MID_HT variables from the ANSUR data and converted the values from millimters to inches.  From there I joined the `ansur_hts` data frame below to my `pfx_14` data frame.  This is all pre-loaded in the `pfx_14` data frame we read in above.  In case you're interested, here's how I did it.
+Using `dplyr`, I extracted the STATURE, WAIST_HT_NATURAL, and PATELLA.MID_HT variables from the ANSUR data and converted the values from millimeters to inches.  From there I joined the `ansur_hts` data frame below to my `pfx_14` data frame.  This is all pre-loaded in the `pfx_14` data frame we read in above.  In case you're interested, here's how I did it.
 
 ```{r}
 # Read in raw ANSUR data
@@ -197,4 +197,4 @@ ggplot(data = sort_pfx_accuracy,
 
 Using our new upper and lower boundary parameters, umpire accuracy appears to vary from approximately 82.17% to about 93.08%.  Again, the data include both full-time and AAA call-up umpires who may have either worked spring training or various regular season games.  I realize this may be somewhat problematic, but since this series of posts are somewhat exploratory in nature, I'll keep the MiLB guys in.  In my next post, we'll use some multilevel modeling strategies to try and account for any umpire-level effects.  
 
-All data files and R code used are availble at .  As always, feedback is welcome!
+All data files and R code used are available in a  [GitHub Repository](https://github.com/aaronbaggett/baseball_blog).  As always, feedback is welcome!
