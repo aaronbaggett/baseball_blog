@@ -2,9 +2,9 @@
 output: html_document
 ---
 
-# Greetings!
+In [my last post](https://baseballwithr.wordpress.com/2015/02/17/conceptualizing-the-mlb-strike-zone-using-pitchfx-data/) we examined differences in the width of the MLB strike zone as measured by the PITCHf/x data, compared to the rule book definition of the strike zone width.  In this post, we'll continue examining methods for properly parameterizing the MLB strike zone, this time, by addressing the upper and lower boundaries.  I should mention that, in order to set the stage for this post, I calculated umpire accuracy rates by aggregating the mean for each batter's upper and lower strike zone boundaries.  In this post, we'll look at a more accurate method for accounting for these boundaries.
 
-In [my last post](https://baseballwithr.wordpress.com/2015/02/17/conceptualizing-the-mlb-strike-zone-using-pitchfx-data/) we examined differences in the width of the MLB strike zone as measured by the PITCHf/x data, compared to the rule book definition of the strike zone width.  In this post, we'll continue examining methods for properly parameterizing the MLB strike zone by addressing the upper and lower boundaries.  Again, we're primarily interested in understanding umpires' patterns of decision making.  When measuring anything, we must ensure all parameters are properly operationalized.  We've already seen that when we account for the radius of a regulation sized baseball by adding 1.57 inches to each side of the plate, umpires' accuracy rates improve from approximately 86.41% to about 92.42%.  This difference of 6% matters--especially if you're at all tired of hearing people complain about how "bad" umpires are.
+Again, we're primarily interested in understanding umpires' patterns of decision making.  When measuring anything, we must ensure all parameters are properly operationalized.  We've already seen that when we account for the radius of a regulation sized baseball by adding 1.57 inches to each side of the plate, umpires' accuracy rates improve from approximately 86.41% to about 92.42%.  This difference of 6% matters--especially if you're at all tired of hearing people complain about how "bad" umpires are.
 
 <br>
 <center>
@@ -139,7 +139,7 @@ pfx_14$u_test_ht <- with(pfx_14,
     pz < ht_bott | pz > ht_top, 0, 99)))))
 ```
 
-Now, let's examine umpire accuracy over the course of the entire 2014 season.
+Now, let's examine umpire accuracy over the course of the entire 2014 season while accounting for the ANSUR dimensions.
 
 ```{r, eval = FALSE}
 (pfx_accuracy <- pfx_14 %>%
@@ -149,7 +149,7 @@ Now, let's examine umpire accuracy over the course of the entire 2014 season.
 )
 ```
 
-The above output includes each individual umpire's mean accuracy for all of the ball/strike decisions he made in 2014.  Over the course of the season, umpires were approximately 86.41% accurate (*SD* = 0.014).
+The above output includes each individual umpire's mean accuracy for all of the ball/strike decisions he made in 2014.  Over the course of the season, umpires were approximately 90.46% (*SD* = 0.12).  Interesting!  Before, when we used each batter's mean upper and lower boundaries, the umpire accuracy rate was 92.42% (*SD* = 0.013).  Although this may not see like much of a difference, I think these values are perhaps more reliable.
 
 ```{r, eval = FALSE}
 # Calculate mean *accuracy*
@@ -177,63 +177,6 @@ ggplot(data = sort_pfx_accuracy,
   geom_line(aes(group = 1), color = "gray30") +
   geom_point(color = "gray10") + 
   scale_x_continuous(limits = c(0.78, 0.95), breaks = seq(0.78, 0.95, 0.010), 
-    name = "\nUmpire Decision Accuracy\nWidth of Strike Zone = 17 inches") +
-  scale_y_discrete(name = "", labels = rev(sort_pfx_accuracy$umpire)) +
-  theme_bw() +
-  theme(axis.title.x = element_text(size = 10), 
-    axis.text.x = element_text(size = 8)) +
-  theme(axis.title.y = element_text(size = 10), 
-    axis.text.y = element_text(size = 6))
-```
-
-Using the PITCHf/x strike zone width parameters, umpire accuracy appears to vary from approximately 81.76% to about 92.06%.  The latter rate is really pretty good.  However, by reconceptualizing the width, I think we can make more accurate estimates of umpire accuracy.
-
-As we saw in the rule book definition of a strike above, a strike occurs when any part of the baseball passes through any part of the strike zone.  In other words, from the umpire's vantage point behind home plate, if the left edge of the baseball passes over the left edge of the plate and is between the batter's upper and lower boundaries, then that pitch should be called a strike.  However, since the coordinates of the PITCHf/x data plot the center point of the baseball, this pitch might appear to be off the plate inside to a right handed batter.  Therefore, an umpire may be incorrectly penalized for having called this pitch a strike.
-
-
-
-As we can see, the strike zone width is now broadened from 17 inches to approximately 20.14 inches.  The question then is, Do these differences matter?  Let's check it out.  To do so, we'll basically use the same general **R** code from above.  Only this time, I've added a new variable, `u_test`, to the same `pfx_14` data frame, which now compares the umpire's call to our new dimensions for the width.  I did this using a clunky series of `ifelse` statements below.
-
-
-
-Now we're ready to calculate our umpire accuracy rates using our new dimensions for the strike zone width.  Now, let's reexamine umpire accuracy over the course of the entire 2014 season.
-
-```{r, eval = FALSE}
-(new_pfx_accuracy <- pfx_14 %>%
-  group_by(umpire) %>%
-  summarize(accuracy = mean(u_test),
-    se = sd(u_test) / sqrt(length(u_test)))
-)
-```
-
-With our new interpretation of the strike zone width, we see that umpires are now approximately 92.42% accurate (*SD* = 0.013).  This is an overall increase of about 6%.
-
-```{r, eval = FALSE}
-# Calculate mean *accuracy*
-with(new_pfx_accuracy, mean(accuracy))
-
-# Calculate sd *accuracy*
-with(new_pfx_accuracy, sd(accuracy))
-```
-
-Again, we can visualize our new accuracy rates in a dotplot similar to the one above.  This plot uses our `new_pfx_accuracy` data frame from above.
-
-```{r, eval = FALSE, fig.align = 'center', fig.height = 12}
-# Sort *pfx_accuracy* in descending order
-sort_new_pfx_accuracy <- new_pfx_accuracy[order(-new_pfx_accuracy$accuracy), ]
-
-### --- Build dotplot --- ###
-ggplot(data = sort_new_pfx_accuracy, 
-  aes(x = accuracy, y = sort(umpire, decreasing = TRUE))) +
-  geom_vline(aes(xintercept = mean(accuracy)), 
-    color = "red", linetype = 2, size = 0.35) +
-  geom_segment(aes(x = accuracy - se, xend = accuracy + se, 
-    y = sort(umpire, decreasing = TRUE), 
-    yend = sort(umpire, decreasing = TRUE)), 
-    color = "gray30", size = 0.25) +
-  geom_line(aes(group = 1), color = "gray30") +
-  geom_point(color = "gray10") + 
-  scale_x_continuous(limits = c(0.85, 0.955), breaks = seq(0.85, 0.955, 0.010), 
     name = "\nUmpire Decision Accuracy\nWidth of Strike Zone = 20.14 inches") +
   scale_y_discrete(name = "", labels = rev(sort_pfx_accuracy$umpire)) +
   theme_bw() +
@@ -243,26 +186,4 @@ ggplot(data = sort_new_pfx_accuracy,
     axis.text.y = element_text(size = 6))
 ```
 
-To put all this in perspective, during the 2014 season, umpires worked about 25 games behind the plate (*SD* = 10.72) and made approximately 146.08 decisions per game (*SD* = 7.07). 
-
-```{r, eval = FALSE}
-# Calculate mean and SD decisions umpires make during games?
-decisions <- pfx_14 %>%
-  group_by(umpire) %>%
-  filter(call == "Called Strike" | call == "Ball") %>%
-  summarize(games = length(unique(gameday_link)), 
-    n = length(gameday_link), decisions = n/games)
-
-decisions %>%
-  summarize(mean = mean(decisions), sd = sd(decisions))
-```
-
-Again, the data include both full-time and AAA call-up umpires who may have either worked spring training or various regular season games.  I realize this may be somewhat problematic, but since this is somewhat exploratory in nature, I'll keep the MiLB guys in.  At any rate, when we compare the proportion of accurate decisions umpires make using our new parameters for the strike zone width, compared to the raw PITCHf/x parameters we see a mean difference of about 8.78 pitches per game (*SD* = 2.05).
-
-Although the rule book definition only addresses the upper and lower boundaries of the strike zone, there are really two parameters we have to address when measuring umpire decision accuracy.  As we've seen, perhaps the easiest parameter to establish is the width of the strike zone.  In my next post, we'll try and do the same with the upper and lower boundaries.
-
-**Notes:**
-
-1. By the way, this is true for both right and left handed batters.
-2. For now, these data include both spring training and postseason play.  In the future, it may be more accurate to limit our observations to the regular and postseason.  Comments and feedback related to this are welcome!
-3. The code I used to draw the home plate figure is available here at this [GitHub repository](https://github.com/aaronbaggett/baseball_blog)
+Using our new upper and lower boundary parameters, umpire accuracy appears to vary from approximately 82.17% to about 93.08%.  Again, the data include both full-time and AAA call-up umpires who may have either worked spring training or various regular season games.  I realize this may be somewhat problematic, but since this series of posts are somewhat exploratory in nature, I'll keep the MiLB guys in.  In my next post, we'll use some multilevel modeling strategies to try and account for any umpire-level effects.  As always, feedback is welcome!

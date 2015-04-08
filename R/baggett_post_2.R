@@ -69,6 +69,8 @@ ansur_hts <- ansur %>%
 
 pfx_14 <- left_join(pfx_14, ansur_hts)
 
+pfx_14 <- na.omit(pfx_14)
+
 save(pfx_14, file = "~/Desktop/pfx_14.Rda")
 
 # Create *u_test_ht* variable for umpire's decision [1 = correct]
@@ -83,6 +85,12 @@ pfx_14$u_test_ht <- with(pfx_14,
     px > -0.8391667 & px < 0.8391667, 0,
   ifelse(call == "Called Strike" & px < -0.8391667 | px > 0.8391667 | 
     pz < ht_bott | pz > ht_top, 0, 99)))))
+
+(pfx_accuracy <- pfx_14 %>%
+    group_by(umpire) %>%
+    summarize(accuracy = mean(u_test),
+      se = sd(u_test) / sqrt(length(u_test)))
+)
 
 
 
