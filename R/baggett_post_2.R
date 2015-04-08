@@ -71,6 +71,19 @@ pfx_14 <- left_join(pfx_14, ansur_hts)
 
 save(pfx_14, file = "~/Desktop/pfx_14.Rda")
 
+# Create *u_test_ht* variable for umpire's decision [1 = correct]
+# given ANSUR data/batter height transformation
+# Includes ball radius = ((1.57*2 + 17) / 12) / 2 = 0.8391667
+pfx_14$u_test_ht <- with(pfx_14,
+  ifelse(call == "Ball" & px < -0.8391667 | px > 0.8391667 | 
+    pz < ht_bott | pz > ht_top, 1,
+  ifelse(call == "Called Strike" & pz >= ht_bott & pz <= ht_top & 
+    px >= -0.8391667 & px <= 0.8391667, 1,
+  ifelse(call == "Ball" & pz >= ht_bott & pz <= ht_top & 
+    px > -0.8391667 & px < 0.8391667, 0,
+  ifelse(call == "Called Strike" & px < -0.8391667 | px > 0.8391667 | 
+    pz < ht_bott | pz > ht_top, 0, 99)))))
+
 
 
 
