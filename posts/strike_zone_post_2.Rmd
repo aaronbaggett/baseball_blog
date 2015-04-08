@@ -121,17 +121,31 @@ ansur_hts <- ansur %>%
   summarize(ht_top = mean(WAIST_HT_NATURAL)/12, ht_bott = mean(PATELLA.MID_HT)/12)
 ```
 
-# Section
+# Updated Umpire Accuracy
+By comparing the umpire's original decision (`call`) to the pitch's location (`zone`), I added a dichotomous variable, `u_test_ht`, to my `pfx_14` data frame, which represents the accuracy of the umpire's decision (i.e., 1 = correct, 0 = incorrect), accounting for both the radius of the baseball and our new `ht_top` and `ht_bott` variables from above.
 
+```{r, eval = FALSE}
+# Create *u_test_ht* variable for umpire's decision [1 = correct]
+# given ANSUR data/batter height transformation
+# Includes ball radius = ((1.57*2 + 17) / 12) / 2 = 0.8391667
+pfx_14$u_test_ht <- with(pfx_14,
+  ifelse(call == "Ball" & px < -0.8391667 | px > 0.8391667 | 
+    pz < ht_bott | pz > ht_top, 1,
+  ifelse(call == "Called Strike" & pz >= ht_bott & pz <= ht_top & 
+    px >= -0.8391667 & px <= 0.8391667, 1,
+  ifelse(call == "Ball" & pz >= ht_bott & pz <= ht_top & 
+    px > -0.8391667 & px < 0.8391667, 0,
+  ifelse(call == "Called Strike" & px < -0.8391667 | px > 0.8391667 | 
+    pz < ht_bott | pz > ht_top, 0, 99)))))
+```
 
-
-By comparing the umpire's original decision (`call`) to the pitch's location (`zone`), I added a dichotomous variable, `u_test_pfx`, to my `pfx_14` data frame, which represents the accuracy of the umpire's decision (i.e., 1 = correct, 0 = incorrect).  Now, let's examine umpire accuracy over the course of the entire 2014 season$^2$.
+Now, let's examine umpire accuracy over the course of the entire 2014 season.
 
 ```{r, eval = FALSE}
 (pfx_accuracy <- pfx_14 %>%
   group_by(umpire) %>%
-  summarize(accuracy = mean(u_test_pfx),
-    se = sd(u_test_pfx) / sqrt(length(u_test_pfx)))
+  summarize(accuracy = mean(u_test_ht),
+    se = sd(u_test_ht) / sqrt(length(u_test_ht)))
 )
 ```
 
@@ -180,20 +194,7 @@ As we saw in the rule book definition of a strike above, a strike occurs when an
 
 As we can see, the strike zone width is now broadened from 17 inches to approximately 20.14 inches.  The question then is, Do these differences matter?  Let's check it out.  To do so, we'll basically use the same general **R** code from above.  Only this time, I've added a new variable, `u_test`, to the same `pfx_14` data frame, which now compares the umpire's call to our new dimensions for the width.  I did this using a clunky series of `ifelse` statements below.
 
-```{r, eval = FALSE}
-# Create *u_test_ht* variable for umpire's decision [1 = correct]
-# given ANSUR data/batter height transformation
-# Includes ball radius = ((1.57*2 + 17) / 12) / 2 = 0.8391667
-pfx_14$u_test_ht <- with(pfx_14,
-  ifelse(call == "Ball" & px < -0.8391667 | px > 0.8391667 | 
-    pz < ht_bott | pz > ht_top, 1,
-  ifelse(call == "Called Strike" & pz >= ht_bott & pz <= ht_top & 
-    px >= -0.8391667 & px <= 0.8391667, 1,
-  ifelse(call == "Ball" & pz >= ht_bott & pz <= ht_top & 
-    px > -0.8391667 & px < 0.8391667, 0,
-  ifelse(call == "Called Strike" & px < -0.8391667 | px > 0.8391667 | 
-    pz < ht_bott | pz > ht_top, 0, 99)))))
-```
+
 
 Now we're ready to calculate our umpire accuracy rates using our new dimensions for the strike zone width.  Now, let's reexamine umpire accuracy over the course of the entire 2014 season.
 
