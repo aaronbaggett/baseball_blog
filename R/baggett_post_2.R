@@ -41,37 +41,24 @@ ggplot(data = carp, aes(x = sz_bot)) +
     breaks = seq(0, 16, 2), name = "Density\n") +
   theme_bw()
 
-heights <- read.csv("/Users/AB/Dropbox/Dissertation/Data/Anthropometric Data/Anthropometric_Measurements.csv")
+# Read in raw ANSUR data
+ansur <- read.delim("http://aaronbaggett.com/data/ansur_men.txt", header = TRUE)
 
-
-
-WAIST_HT_NATURAL: length from ground to midpoint between shoulders and waist
-PATELLA.MID_HT: length from ground to knee
-
-feet <- as.numeric(as.character(substr(pfx_14$b_height, 1, 1)))*12
-feet <- feet + as.numeric(as.character(substr(pfx_14$b_height, 3, 3)))
-
-pfx_14$b_height <- feet
-
-ansur <- read.delim("~/baseball_blog/data/ansur_men.txt", header = TRUE)
-
+# Select a few variables from ANSUR data
 ansur <- ansur %>% 
-  select(STATURE, SUPRASTERNALE_HT, WAIST_HT_NATURAL, PATELLA.MID_HT)
+  select(STATURE, WAIST_HT_NATURAL, PATELLA.MID_HT)
 
+# Convert ANSUR dimensions from millimeters to inches
 ansur <- compute(ansur*0.0393701)
 
+# Round values
 ansur$STATURE <- round(ansur$STATURE)
 
+# Convert ANSUR data from inches to feet
 ansur_hts <- ansur %>% 
   select(b_height = STATURE, WAIST_HT_NATURAL, PATELLA.MID_HT) %>% 
   group_by(b_height) %>%
   summarize(ht_top = mean(WAIST_HT_NATURAL)/12, ht_bott = mean(PATELLA.MID_HT)/12)
-
-pfx_14 <- left_join(pfx_14, ansur_hts)
-
-pfx_14 <- na.omit(pfx_14)
-
-save(pfx_14, file = "~/Desktop/pfx_14.Rda")
 
 # Create *u_test_ht* variable for umpire's decision [1 = correct]
 # given ANSUR data/batter height transformation
@@ -86,12 +73,38 @@ pfx_14$u_test_ht <- with(pfx_14,
   ifelse(call == "Called Strike" & px < -0.8391667 | px > 0.8391667 | 
     pz < ht_bott | pz > ht_top, 0, 99)))))
 
+## Calculate mean and se umpire accuracy rates
 (pfx_accuracy <- pfx_14 %>%
     group_by(umpire) %>%
     summarize(accuracy = mean(u_test),
       se = sd(u_test) / sqrt(length(u_test)))
 )
 
+# Calculate mean *accuracy*
+with(pfx_accuracy, mean(accuracy))
 
+# Calculate sd *accuracy*
+with(pfx_accuracy, sd(accuracy))
 
+# Sort *pfx_accuracy* in descending order
+sort_pfx_accuracy <- pfx_accuracy[order(-pfx_accuracy$accuracy), ]
 
+### --- Build dotplot --- ###
+ggplot(data = sort_pfx_accuracy, 
+  aes(x = accuracy, y = sort(umpire, decreasing = TRUE))) +
+  geom_vline(aes(xintercept = mean(accuracy)), 
+    color = "red", linetype = 2, size = 0.35) +
+  geom_segment(aes(x = accuracy - se, xend = accuracy + se, 
+    y = sort(umpire, decreasing = TRUE), 
+    yend = sort(umpire, decreasing = TRUE)), 
+    color = "gray30", size = 0.25) +
+  geom_line(aes(group = 1), color = "gray30") +
+  geom_point(color = "gray10") + 
+  scale_x_continuous(limits = c(0.78, 0.95), breaks = seq(0.78, 0.95, 0.010), 
+    name = "\nUmpire Decision Accuracy\nWidth of Strike Zone = 20.14 inches") +
+  scale_y_discrete(name = "", labels = rev(sort_pfx_accuracy$umpire)) +
+  theme_bw() +
+  theme(axis.title.x = element_text(size = 10), 
+    axis.text.x = element_text(size = 8)) +
+  theme(axis.title.y = element_text(size = 10), 
+    axis.text.y = element_text(size = 6))

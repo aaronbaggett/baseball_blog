@@ -2,6 +2,8 @@
 output: html_document
 ---
 
+# Previously in Exploring Baseball Data with R
+
 In [my last post](https://baseballwithr.wordpress.com/2015/02/17/conceptualizing-the-mlb-strike-zone-using-pitchfx-data/) we examined differences in the width of the MLB strike zone as measured by the PITCHf/x data, compared to the rule book definition of the strike zone width.  In this post, we'll continue examining methods for properly parameterizing the MLB strike zone, this time, by addressing the upper and lower boundaries.  I should mention that, in order to set the stage for this post, I calculated umpire accuracy rates by aggregating the mean for each batter's upper and lower strike zone boundaries.  In this post, we'll look at a more accurate method for accounting for these boundaries.
 
 Again, we're primarily interested in understanding umpires' patterns of decision making.  When measuring anything, we must ensure all parameters are properly operationalized.  We've already seen that when we account for the radius of a regulation sized baseball by adding 1.57 inches to each side of the plate, umpires' accuracy rates improve from approximately 86.41% to about 92.42%.  This difference of 6% matters--especially if you're at all tired of hearing people complain about how "bad" umpires are.
@@ -142,6 +144,7 @@ pfx_14$u_test_ht <- with(pfx_14,
 Now, let's examine umpire accuracy over the course of the entire 2014 season while accounting for the ANSUR dimensions.
 
 ```{r, eval = FALSE}
+# Calculate mean and se umpire accuracy rates
 (pfx_accuracy <- pfx_14 %>%
   group_by(umpire) %>%
   summarize(accuracy = mean(u_test_ht),
@@ -161,7 +164,7 @@ with(pfx_accuracy, sd(accuracy))
 
 It might help to visualize these accuracy rates in a dotplot.  I've set one up below and added the *SE* to each side of the accuracy points.  This plot uses our `pfx_accuracy` data frame from above.
 
-```{r, eval = FALSE, fig.align = 'center', fig.height = 12}
+```{r, eval = FALSE}
 # Sort *pfx_accuracy* in descending order
 sort_pfx_accuracy <- pfx_accuracy[order(-pfx_accuracy$accuracy), ]
 
@@ -186,4 +189,12 @@ ggplot(data = sort_pfx_accuracy,
     axis.text.y = element_text(size = 6))
 ```
 
-Using our new upper and lower boundary parameters, umpire accuracy appears to vary from approximately 82.17% to about 93.08%.  Again, the data include both full-time and AAA call-up umpires who may have either worked spring training or various regular season games.  I realize this may be somewhat problematic, but since this series of posts are somewhat exploratory in nature, I'll keep the MiLB guys in.  In my next post, we'll use some multilevel modeling strategies to try and account for any umpire-level effects.  As always, feedback is welcome!
+<br>
+<center>
+![umpires](http://aaronbaggett.com/img/umpire_accuracy.jpg)
+</center>
+<br>
+
+Using our new upper and lower boundary parameters, umpire accuracy appears to vary from approximately 82.17% to about 93.08%.  Again, the data include both full-time and AAA call-up umpires who may have either worked spring training or various regular season games.  I realize this may be somewhat problematic, but since this series of posts are somewhat exploratory in nature, I'll keep the MiLB guys in.  In my next post, we'll use some multilevel modeling strategies to try and account for any umpire-level effects.  
+
+All data files and R code used are availble at .  As always, feedback is welcome!
