@@ -47,9 +47,12 @@ ansur <- read.delim("http://aaronbaggett.com/data/ansur_men.txt", header = TRUE)
 # Select a few variables from ANSUR data
 ansur <- ansur %>% 
 <<<<<<< HEAD
+<<<<<<< HEAD
   select(STATURE, SUPRASTERNALE_HT, WAIST_HT_NATURAL, PATELLA.MID_HT) %>% 
   mutate(UPPER_BOUND = WAIST_HT_NATURAL - (STATURE - PATELLA.MID_HT), LOWER_BOUND = PATELLA.MID_HT)
 =======
+=======
+>>>>>>> origin/master
   select(STATURE, WAIST_HT_NATURAL, PATELLA.MID_HT)
 
 # Convert ANSUR dimensions from millimeters to inches
@@ -86,17 +89,25 @@ pfx_14$u_test_ht <- with(pfx_14,
 
 # Calculate mean *accuracy*
 with(pfx_accuracy, mean(accuracy))
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
 >>>>>>> origin/master
 
 # Calculate sd *accuracy*
 with(pfx_accuracy, sd(accuracy))
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 STATURE: height
 SUPRASTERNALE_HT: length from top of shoulders to ground
 WAIST_HT.OMPHALION: length from top of pants to ground
 WAIST_HT_NATURAL: length from midpoint between shoulders and waist and ground
 PATELLA.MID_HT: length from knee to ground
+=======
+# Sort *pfx_accuracy* in descending order
+sort_pfx_accuracy <- pfx_accuracy[order(-pfx_accuracy$accuracy), ]
+>>>>>>> origin/master
 =======
 # Sort *pfx_accuracy* in descending order
 sort_pfx_accuracy <- pfx_accuracy[order(-pfx_accuracy$accuracy), ]
