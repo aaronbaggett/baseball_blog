@@ -22,16 +22,16 @@ library(pitchRx)
 pfx_14_all <- src_sqlite("~/Dropbox/pfx_data/pfx_14.sqlite3")
 
 ### --- Convert *pfx_14_all* tables to standalone tables --- ###
-# action <- tbl(pfx_14_all, "action")
-atbat <- tbl(pfx_14_all, "atbat")
-# coach <- tbl(pfx_14_all, "coach")
-# game <- tbl(pfx_14_all, "game")
-# media <- tbl(pfx_14_all, "media")
-pitch <- tbl(pfx_14_all, "pitch")
-# player <- tbl(pfx_14_all, "player")
-# po <- tbl(pfx_14_all, "po")
-# runner <- tbl(pfx_14_all, "runner")
-umpire <- tbl(pfx_14_all, "umpire")
+action <- tbl(pfx_14_all, "action"); glimpse(action)
+atbat <- tbl(pfx_14_all, "atbat"); glimpse(atbat)
+coach <- tbl(pfx_14_all, "coach"); glimpse(coach)
+game <- tbl(pfx_14_all, "game"); glimpse(game)
+media <- tbl(pfx_14_all, "media"); glimpse(media)
+pitch <- tbl(pfx_14_all, "pitch"); glimpse(pitch)
+player <- tbl(pfx_14_all, "player"); glimpse(player)
+po <- tbl(pfx_14_all, "po"); glimpse(po)
+runner <- tbl(pfx_14_all, "runner"); glimpse(runner)
+umpire <- tbl(pfx_14_all, "umpire"); glimpse(umpire)
 
 ### --- Chaining operations for data munging (I hate that word tho!) --- ###
 atbats <- atbat %>%
